@@ -17,7 +17,18 @@ export const getProject = async (req, res) => {
 // CREATE
 export const createProject = async (req, res) => {
   try {
-    const { title, description, category, date, technologies, codeUrl, liveUrl, featured } = req.body;
+    const {
+      title,
+      description,
+      category,
+      date,
+      technologies,
+      codeUrl,
+      liveUrl,
+      backendCodeUrl,   // ✅ NEW
+      backendLiveUrl,   // ✅ NEW
+      featured,
+    } = req.body;
 
     const project = await Project.create({
       title,
@@ -27,6 +38,8 @@ export const createProject = async (req, res) => {
       technologies: technologies ? JSON.parse(technologies) : [],
       codeUrl,
       liveUrl,
+      backendCodeUrl,   // ✅ NEW
+      backendLiveUrl,   // ✅ NEW
       featured: featured === "true",
       image: req.file?.path,
       imagePublicId: req.file?.filename,
@@ -44,15 +57,31 @@ export const updateProject = async (req, res) => {
     const project = await Project.findById(req.params.id);
     if (!project) return res.status(404).json({ message: "Not found" });
 
-    const { title, description, category, date, technologies, codeUrl, liveUrl, featured } = req.body;
+    const {
+      title,
+      description,
+      category,
+      date,
+      technologies,
+      codeUrl,
+      liveUrl,
+      backendCodeUrl,   // ✅ NEW
+      backendLiveUrl,   // ✅ NEW
+      featured,
+    } = req.body;
 
     if (title) project.title = title;
     if (description) project.description = description;
     if (category) project.category = category;
     if (date) project.date = date;
     if (technologies) project.technologies = JSON.parse(technologies);
-    if (codeUrl) project.codeUrl = codeUrl;
-    if (liveUrl) project.liveUrl = liveUrl;
+
+    // Allow empty strings to clear fields
+    if (codeUrl !== undefined) project.codeUrl = codeUrl;
+    if (liveUrl !== undefined) project.liveUrl = liveUrl;
+    if (backendCodeUrl !== undefined) project.backendCodeUrl = backendCodeUrl;   // ✅ NEW
+    if (backendLiveUrl !== undefined) project.backendLiveUrl = backendLiveUrl;   // ✅ NEW
+
     if (featured !== undefined) project.featured = featured === "true";
 
     if (req.file) {

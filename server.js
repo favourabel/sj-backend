@@ -2,10 +2,15 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+
+// ==================== ROUTE IMPORTS ====================
 import authRoutes from "./routes/authRoutes.js";
-// ... your other imports
+import projectRoutes from "./routes/projectRoutes.js";   // ✅ ADD THIS
 
 dotenv.config();
+
+mongoose.set("bufferCommands", false);
+mongoose.set("bufferTimeoutMS", 10000);
 
 const app = express();
 
@@ -42,7 +47,7 @@ app.use(
 /* ------------------------------------------------------------------ */
 
 app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 /* ------------------------------------------------------------------ */
 /*  Routes                                                            */
@@ -52,8 +57,31 @@ app.get("/", (req, res) => {
   res.json({ message: "✅ SJ Backend API is running" });
 });
 
-app.use("/auth", authRoutes);
-// app.use("/projects", projectRoutes);  // your other routes
+app.use("/api/auth", authRoutes);           // ✅ Added /api prefix
+app.use("/api/projects", projectRoutes);    // ✅ Added /api prefix
+
+/* ------------------------------------------------------------------ */
+/*  404 Handler — catch any unmatched routes                          */
+/* ------------------------------------------------------------------ */
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/*  Global Error Handler                                              */
+/* ------------------------------------------------------------------ */
+
+app.use((err, req, res, next) => {
+  console.error("❌ Server Error:", err.message);
+  res.status(500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
 
 /* ------------------------------------------------------------------ */
 /*  Database Connection                                               */

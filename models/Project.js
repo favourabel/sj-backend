@@ -9,8 +9,15 @@ const projectSchema = new mongoose.Schema(
     technologies: [{ type: String }], // ["React", "Node.js"...]
     image: { type: String }, // cloudinary URL
     imagePublicId: { type: String }, // for deletion
-    codeUrl: { type: String },
-    liveUrl: { type: String },
+
+    // Frontend links
+    codeUrl: { type: String },        // Frontend GitHub
+    liveUrl: { type: String },        // Frontend Live Demo
+
+    // ✅ NEW — Backend links (optional, mainly for Full Stack)
+    backendCodeUrl: { type: String }, // Backend GitHub
+    backendLiveUrl: { type: String }, // Backend Live URL (e.g., Render API)
+
     featured: { type: Boolean, default: false },
   },
   { timestamps: true }
